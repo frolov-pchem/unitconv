@@ -1,0 +1,52 @@
+
+unitconv.py - tool and module to convert measured units
+
+     The unit converter. Written on 13.04.2013 by Andrey Frolov in Ivanovo, ISC RAS
+     The current version 1.5 is released on 25.07.2014 by Andrey Frolov in Massy, Paris
+
+### USAGE
+
+     EXAMPLE USAGE: unitconv.py kJ/mol/rad^2  kcal/mol/rad^2
+     EXAMPLE USAGE: unitconv.py mol*m^-3  nm^-3
+     EXAMPLE USAGE: unitconv.py -h
+     EXAMPLE USAGE: unitconv.py kcal/mol  toGMX
+
+     The script takes exactly two command line arguments. It returns the factor to convert units in the first argument to units in the second argument. The special signs [*] and [_] mean multiplication, [/] means division, [^] means power. Case insensitive. If the first argument is -h or --help then the help message will be printed and nothing returned. If the second argument is a special unitkey (e.g. [toGMX]) then the units to convert to are generated from a special prestored list, based on the unit type sequence given in the first argument (e.g. [unitconv.py  kcal/mol toGMX] corresponds to [unitconv.py kcal/mol kJ/mol], because [kJ] and [mol] are intenal units of Gromacs code (GMX)). If the scripts fails the float('NaN') is retuned.
+
+     The following units supported so far (easy to extend in the source code):
+        Distance: ['dm', 'angstr', 'm', 'nm', 'cm']
+        Energy  : ['kj', 'j', 'kcal', 'kbt', 'kb']
+        Angle   : ['rad', 'degree']
+        Number  : ['number', 'mol']
+
+     The following special unitkeys supported so far (easy to extend in the source code):
+        togmx   - convert to Gromacs (www.gromacs.org) internal units:  {'Distance': 'nm', 'Energy': 'kj', 'Angle': 'rad', 'Number': 'mol'}
+        towham  - convert to WHAM code by Grossfield lab (http://membrane.urmc.rochester.edu/content/wham/) units:  {'Distance': 'angstr', 'Energy': 'kcal', 'Angle': 'rad', 'Number': 'mol'}
+
+
+### Version 1.5 release notes:
+  1) Changed special keys from upper case to lowercase: e.g. toGMX to togmx
+  2) Extend an error message to display the second possible reason of unit sequence missmatch error (e.g. mol/badunit^3 nm^-3):
+  {
+  unitconv.py mol/badunit^3 nm^-3
+  !Error in FactorForUnits: the unit type sequences you specified are not equal (for shorter sequence: ['Number', 'none', 'Distance'] and for longer sequence: ['Number', 'none']). The missing unit is not of type number. Returning NaN.
+  !Due to an error /home/frolov/Mysoft/unitconv/unitconv.py returned NaN.
+  }
+  Extended the error message: sys.stderr.write('!Error in FactorForUnits: the unit type sequences you specified WERE NOT equal AND still not equal after trying to deduce missing unit (we have: for shorter sequence: '+str(utls)+' and for longer sequence: '+str(utll)+'). This might be caused together or independently by the following reasons: 1) the missing unit is not of type "number", 2) some of the units are not known, but this could not be caugth automatically. Please, consult help for known units. Returning NaN.\n')
+
+
+### Version 1.4 release notes:
+  1) Extended special keys TODO: write appropriate help for this
+  2) Added kBT energy unit
+  3) Bug fix: conversion to/from units "j" was wrong. Factor was 1e-3 now is 1000. 
+  4) "cm" and "dm" added
+
+
+### Version 1.3 release notes:
+  1) The code splited into two parts: file FactorToConvertUnits.py - module which can be loaded from any python code, and the unitconv.py - program which does the conversion of units in command line using methods (fanction) build in FactorToConvertUnits.py. To use the module one should set the unitconv path to PYTHONPATH
+
+### Version 1.1 and 1.2 release notes:
+  1) Bug fix: occasional errors unit1 is not known
+  2) Added special unitkeys feature. See help for more details.
+  3) Added special untkey: WHAM
+  4) Few other minor changes
